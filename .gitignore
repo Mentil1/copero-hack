@@ -1,0 +1,19 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node (in case you add tooling later)
+node_modules/
+npm-debug.log*
+
+# Local files you don't want to publish
+*.log
+*.local
+.env
