@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.1.0 — 2026-10-13
+
+### Added
+- **Club options** (panel section "Clubs" / "Clubes"):
+  - **Club country**: the clubs the script offers or moves you to come from the country you pick. This fixes German clubs (and most other national leagues) almost never showing up once your OVR is high: from OVR 87 the game only draws offers from its top reputation tiers, where Germany has 5 of 37 clubs.
+  - **Club level**: match your OVR like the game does, or any level.
+  - **New club every period**: transfer screens lose the "stay" choice; on screens where every choice keeps you at your club, the script moves you to a new club right before you decide.
+- **Minimum OVR**: an OVR floor that also works on its own.
+- **Reset settings** button and **Alt+H** to show / hide the panel; the panel now scrolls on small screens.
+- The club list is read from the game's own code when the panel loads, so new or renamed clubs are picked up automatically. A **Club data** line in the panel shows whether it loaded.
+
+### Changed
+- Presets (God / Realistic / Custom) only change the OVR and injury options; club options are kept.
+- Both scripts are now generated from the same code: only the text block and the header comments differ.
+
 ## 3.0.0 — 2026-10-10
 
 First release of **Copero Hack**: a rewrite of Carliyo's *Copero 99 OVR* script (v2.1.0) for the current game build (`CareerSimulatorPage-D1pHETwp.js`). The original stopped working after Copero updated the simulator.

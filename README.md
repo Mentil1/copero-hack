@@ -4,9 +4,9 @@
 
 A Tampermonkey script with configurable cheats for the [Copero Career Simulator](https://copero.com.ar/juegos/simulador-carrera).
 
-Based on the original *Copero 99 OVR* script by **Carliyo**, rewritten for the current game and maintained by **Ment1l**. Two simple modes: **God Mode** (OVR always 99) and **Realistic Mode** (OVR climbs to a peak, then declines with age). Everything is configurable from a floating panel inside the game.
+Based on the original *Copero 99 OVR* script by **Carliyo**, rewritten for the current game and maintained by **Mentil1**. Two simple modes: **God Mode** (OVR always 99) and **Realistic Mode** (OVR climbs to a peak, then declines with age). Everything is configurable from a floating panel inside the game.
 
-> **Last verified:** October 10, 2026, against the build `CareerSimulatorPage-D1pHETwp.js` (script v3.0.0).
+> **Last verified:** October 13, 2026, against the build `CareerSimulatorPage-D1pHETwp.js` (script v3.1.0).
 > Copero updates the game often. If the script stops working, see [Troubleshooting](#-troubleshooting).
 
 ## 🌐 Two versions: English panel or Spanish panel
@@ -15,8 +15,8 @@ Both versions do exactly the same thing. Only the text of the panel changes. **I
 
 | Version | Panel language | One-click install | Source |
 |---------|----------------|-------------------|--------|
-| **English** | English | [Install](https://raw.githubusercontent.com/Ment1l/copero-hack/main/src/copero-hack.en.user.js) | [`copero-hack.en.user.js`](./src/copero-hack.en.user.js) |
-| **Español** | Spanish | [Instalar](https://raw.githubusercontent.com/Ment1l/copero-hack/main/src/copero-hack.es.user.js) | [`copero-hack.es.user.js`](./src/copero-hack.es.user.js) |
+| **English** | English | [Install](https://raw.githubusercontent.com/Mentil1/copero-hack/main/src/copero-hack.en.user.js) | [`copero-hack.en.user.js`](./src/copero-hack.en.user.js) |
+| **Español** | Spanish | [Instalar](https://raw.githubusercontent.com/Mentil1/copero-hack/main/src/copero-hack.es.user.js) | [`copero-hack.es.user.js`](./src/copero-hack.es.user.js) |
 
 The settings are saved under the same key, so they carry over if you switch from one version to the other.
 
@@ -41,7 +41,11 @@ The settings are saved under the same key, so they carry over if you switch from
 | Growth per year | `Growth/year` | `Sube/año` |
 | Decline starts at | `Decline from` | `Baja desde` |
 | Decline per year | `Decline/year` | `Baja/año` |
+| Minimum OVR | `Minimum OVR` | `OVR mínimo` |
 | Prevent injuries | `Prevent injuries` | `Prevenir lesiones` |
+| New club every period | `New club every period` | `Club nuevo cada período` |
+| Club country | `Club country` | `País del club` |
+| Club level | `Club level` | `Nivel del club` |
 
 - **Always OVR 99**: forces the overall to 99 constantly (God Mode). If "Age-based OVR" is also on, this option wins.
 - **Age-based OVR**: the OVR varies with the player's age, simulating a real career
@@ -56,6 +60,20 @@ The settings are saved under the same key, so they carry over if you switch from
   - does **not** block the special "Injury at your peak" event (play injured or recover), and does not undo a suspension that was already served in the period when the event happened
 
 With Realistic Mode and the default values, OVR goes: 16→50, 20→66, 24→82, 27→94, 28 through 31→99, 33→95, 40→81.
+
+- **Minimum OVR**: your OVR never drops below this value (40, the game's own floor, means off). It also works on its own, with both OVR options off.
+
+Presets (God Mode / Realistic / Custom) only change the OVR and injury options; your club options are kept.
+
+### Club options (new in 3.1.0)
+
+The game decides which clubs may want you from your OVR. From OVR 87 up it only offers the top reputation tiers: 80% of the offers come from the 12 clubs at level 5 (Bayern is the only German one) and the rest from the 25 clubs at level 4 (four of them German). Working through the game's own data and rules, that means roughly 1 offered club in 10 is German even if you are German, so German clubs almost never show up once you are strong. These options give you control over that:
+
+- **Club country**: the clubs the script offers you, or moves you to, come from this country (`Any` leaves the game's own offers alone). In God Mode with Germany selected, your offers become Bayern plus one of the four level-4 German clubs instead of the world's elite.
+- **Club level**: `Match my OVR` picks clubs at your offer level (if the country has none left at that level it goes down to smaller clubs first, then up); `Any level` picks any club of that country.
+- **New club every period**: after every decision you move to a new club. A *period* is the stretch the game simulates after each decision: 2 seasons in Normal mode, 1 in Long mode, 3 in Express mode (use Long mode to change club every single season). On transfer screens the "stay" choice is removed, so you have to pick one of the offered clubs. On screens where every choice keeps you at your club (injuries, controversies, etc.) the script moves you to a new club right before you decide. Loans, rival offers, "return home" offers and similar special events are left alone.
+
+The club list is read from the game's own code when the panel loads (see the **Club data** line in the panel), so it stays correct when Copero adds or renames clubs.
 
 ## 📋 Requirements
 
@@ -130,6 +148,8 @@ Since each step starts from the current `player.overall`, **if we leave that val
 6. Also, after each decision the game stores the already-computed next state in another `useState` (`{ previousState, nextState }`) while the animation runs; the script patches that `nextState` too, so the correct OVR shows as soon as the animation ends
 7. It repeats all of this every 500 ms, because every decision creates a new state
 
+**Clubs.** The game embeds its club list (1,244 clubs in 73 leagues, each with a reputation from −1 to 5) as JSON inside the `CareerSimulatorPage-<hash>.js` chunk. When the panel loads, the script fetches that chunk (same origin, normally already cached by the browser) and reads the list from it. Transfer offers are rewritten only on the next state the game has already computed but not shown yet (the `nextState` described above), because changing the choices of a screen that is already visible would break its buttons. Moving the player only changes club ids (`currentTeamId`, `contractTeamId` and `player.currentTeamId`), which is safe at any time; the engine plays the following seasons for the club in `contractTeamId`.
+
 **The script runs in the page context** (`@grant none`). This is needed to read the Fiber that React leaves on DOM nodes; that is also why the configuration is saved in `localStorage` instead of with `GM_setValue`. The `@match` covers all of `copero.com.ar` because the site is an SPA: if you enter the game from the menu there is no page reload, and a stricter `@match` would never run. The panel only shows while the game is on screen, and it is built with DOM APIs (no `innerHTML` or `<style>`) so it doesn't clash with the site's security policies.
 
 ### God Mode vs Realistic Mode
@@ -144,21 +164,26 @@ Since each step starts from the current `player.overall`, **if we leave that val
 
 - In modes with more than one season per decision, the second season of the period starts from the first season's OVR plus the game's own development. As a result, in the history a season may show one or two points less than the OVR the script sets (mostly at older ages). The current and max OVR do stay at the configured value.
 - Suspensions caused by events (for example, choosing badly in a "substance" event) are simulated within the same step in which you decide, so the script can't prevent them; it only stops them from carrying over into later periods.
+- A forced move happens right before you decide, so the text of an event can still mention your old club. If the script only notices a screen after it is already visible, the club shown in the header updates a moment later, but the seasons are still played for the new club.
+- Club options need the club data. If the game's code changes so much that the list can't be read, the **Club data** line says so and the club options turn off; everything else keeps working.
 
 ## 🩺 Troubleshooting
 
 **The panel doesn't appear**
 1. Check the Chrome / Edge permissions note in the installation section ("Allow user scripts" or Developer mode).
 2. With the game open, look at the Tampermonkey icon: it should show a `1` (script active on this page).
-3. Open the browser console (`F12` → Console): you should see `[copero-hack] v3.0.0 loaded` (`cargado` in the Spanish version). If it doesn't appear, the script isn't running; if it appears but you can't see the panel, copy any red error.
+3. Open the browser console (`F12` → Console): you should see `[copero-hack] v3.1.0 loaded` (`cargado` in the Spanish version). If it doesn't appear, the script isn't running; if it appears but you can't see the panel, copy any red error.
 
 **The panel appears but the status line is red ("Career state not found")**
 Copero updated the game and changed something internally. Fixing it requires looking at the current code:
 1. With the game open and a career started, open `F12` → **Sources** and search all files (`Ctrl+Shift+F`) for the text `data-career-phase`.
-2. Save that file (it will be something like `CareerSimulatorPage-xxxx.js`) and [open an issue](https://github.com/Ment1l/copero-hack/issues) with it attached.
+2. Save that file (it will be something like `CareerSimulatorPage-xxxx.js`) and [open an issue](https://github.com/Mentil1/copero-hack/issues) with it attached.
 
 **It says "Active" but the OVR doesn't change**
 The OVR shown on screen updates on the game's next step (when you make the next decision). If it still hasn't changed after a couple of decisions, open an issue and say which mode you picked.
+
+**The Club data line says "not available"**
+The script couldn't read the club list from the game's code (Copero changed how it ships it). Club options stay off until the script is updated; the OVR and injury options still work. Reload the page once first, since on the very first load the browser may not have listed the game's code chunk yet.
 
 ## 📁 Repository structure
 
@@ -179,24 +204,33 @@ copero-hack/
 English panel (the Spanish one has the same layout):
 
 ```
-┌─────────────────────────────────┐
-│ 🏆 Copero Hack                ✕ │
-├─────────────────────────────────┤
-│ Active · age 18 · OVR 58        │
-│                                 │
-│ PRESET MODE                     │
-│ [Realistic               ▼]     │
-│                                 │
-│ OPTIONS                         │
-│ ☐ Always OVR 99                 │
-│ ☑ Age-based OVR                 │
-│     Peak OVR:      [99]         │
-│     Peak age:      [28]         │
-│     Growth/year:   [4]          │
-│     Decline from:  [31]         │
-│     Decline/year:  [2]          │
-│ ☑ Prevent injuries              │
-└─────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ 🏆 Copero Hack                    ✕ │
+├─────────────────────────────────────┤
+│ Active · age 18 · OVR 58            │
+│                                     │
+│ PRESET MODE                         │
+│ [Realistic                      ▼]  │
+│                                     │
+│ OPTIONS                             │
+│ ☐ Always OVR 99                     │
+│ ☑ Age-based OVR                     │
+│     Peak OVR:        [99]           │
+│     Peak age:        [28]           │
+│     Growth/year:     [4]            │
+│     Decline from:    [31]           │
+│     Decline/year:    [2]            │
+│ Minimum OVR:         [40]           │
+│ ☑ Prevent injuries                  │
+│                                     │
+│ CLUBS                               │
+│ ☐ New club every period             │
+│ Club country:        [Germany    ▼] │
+│ Club level:          [Match my OVR▼]│
+│ Club data: 1244 clubs loaded        │
+│ [Reset settings]                    │
+│ v3.1.0 — by Mentil1 (original by …) │
+└─────────────────────────────────────┘
 ```
 
 ## ⚠️ Disclaimer
@@ -215,7 +249,7 @@ Contributions are welcome! If you find bugs or want to propose improvements:
 4. Push the branch (`git push origin feature/my-improvement`)
 5. Open a Pull Request
 
-The two scripts must stay in sync: they contain the same code and only differ in text (panel labels, status messages, comments). If you change the logic, change **both** files and bump `@version` in both, so Tampermonkey offers the update to existing users.
+The two scripts must stay in sync: they contain the same code, and only the `const T = { ... }` block (all panel text) and the header comments differ. If you change the logic, change **both** files and bump `@version` in both, so Tampermonkey offers the update to existing users.
 
 ## 📝 License
 
@@ -223,4 +257,4 @@ MIT — see [`LICENSE`](./LICENSE) for details. The original script is © Carliy
 
 ---
 
-Maintained by **Ment1l** · Based on the original *Copero 99 OVR* by **Carliyo**.
+Maintained by **Mentil1** · Based on the original *Copero 99 OVR* by **Carliyo**.

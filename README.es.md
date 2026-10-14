@@ -4,9 +4,9 @@
 
 Script de Tampermonkey con cheats configurables para el [Simulador de Carrera de Copero](https://copero.com.ar/juegos/simulador-carrera).
 
-Basado en el script original *Copero 99 OVR* de **Carliyo**, reescrito para el juego actual y mantenido por **Ment1l**. Dos modos simples: **Modo Dios** (OVR 99 siempre) y **Modo Realista** (el OVR sube hasta un pico y luego baja con la edad). Todo configurable desde un panel flotante en el juego.
+Basado en el script original *Copero 99 OVR* de **Carliyo**, reescrito para el juego actual y mantenido por **Mentil1**. Dos modos simples: **Modo Dios** (OVR 99 siempre) y **Modo Realista** (el OVR sube hasta un pico y luego baja con la edad). Todo configurable desde un panel flotante en el juego.
 
-> **Última verificación:** 10 de octubre de 2026, contra el build `CareerSimulatorPage-D1pHETwp.js` (script v3.0.0).
+> **Última verificación:** 13 de octubre de 2026, contra el build `CareerSimulatorPage-D1pHETwp.js` (script v3.1.0).
 > Copero actualiza el juego seguido; si dejó de andar, mirá [Solución de problemas](#-solución-de-problemas).
 
 ## 🌐 Dos versiones: panel en español o en inglés
@@ -15,8 +15,8 @@ Las dos versiones hacen exactamente lo mismo. Solo cambia el texto del panel. **
 
 | Versión | Idioma del panel | Instalación con un clic | Código |
 |---------|------------------|-------------------------|--------|
-| **Español** | Español | [Instalar](https://raw.githubusercontent.com/Ment1l/copero-hack/main/src/copero-hack.es.user.js) | [`copero-hack.es.user.js`](./src/copero-hack.es.user.js) |
-| **English** | Inglés | [Install](https://raw.githubusercontent.com/Ment1l/copero-hack/main/src/copero-hack.en.user.js) | [`copero-hack.en.user.js`](./src/copero-hack.en.user.js) |
+| **Español** | Español | [Instalar](https://raw.githubusercontent.com/Mentil1/copero-hack/main/src/copero-hack.es.user.js) | [`copero-hack.es.user.js`](./src/copero-hack.es.user.js) |
+| **English** | Inglés | [Install](https://raw.githubusercontent.com/Mentil1/copero-hack/main/src/copero-hack.en.user.js) | [`copero-hack.en.user.js`](./src/copero-hack.en.user.js) |
 
 La configuración se guarda con la misma clave, así que se conserva si cambias de una versión a la otra.
 
@@ -41,7 +41,11 @@ La configuración se guarda con la misma clave, así que se conserva si cambias 
 | Sube por año | `Sube/año` | `Growth/year` |
 | Baja desde | `Baja desde` | `Decline from` |
 | Baja por año | `Baja/año` | `Decline/year` |
+| OVR mínimo | `OVR mínimo` | `Minimum OVR` |
 | Prevenir lesiones | `Prevenir lesiones` | `Prevent injuries` |
+| Club nuevo cada período | `Club nuevo cada período` | `New club every period` |
+| País del club | `País del club` | `Club country` |
+| Nivel del club | `Nivel del club` | `Club level` |
 
 - **OVR siempre en 99**: fuerza el overall a 99 constantemente (Modo Dios). Si también está activo "OVR basado en edad", gana esta opción.
 - **OVR basado en edad**: el OVR varía según la edad del jugador, simulando una carrera real
@@ -56,6 +60,20 @@ La configuración se guarda con la misma clave, así que se conserva si cambias 
   - **no** bloquea el evento especial "Lesión en el mejor momento" (jugar lesionado o recuperarte), y no deshace una sanción que ya se cumplió en el período en que ocurrió el evento
 
 Con el Modo Realista y los valores por defecto, el OVR queda así: 16→50, 20→66, 24→82, 27→94, 28 a 31→99, 33→95, 40→81.
+
+- **OVR mínimo**: tu OVR nunca baja de este valor (40, el piso del propio juego, significa apagado). También funciona solo, con las dos opciones de OVR desactivadas.
+
+Los modos predefinidos (Modo Dios / Realista / Personalizado) solo cambian las opciones de OVR y lesiones; tus opciones de clubes se conservan.
+
+### Opciones de clubes (nuevo en 3.1.0)
+
+El juego decide qué clubes pueden quererte según tu OVR. Desde OVR 87 solo ofrece los niveles de reputación más altos: el 80 % de las ofertas salen de los 12 clubes de nivel 5 (el Bayern es el único alemán) y el resto de los 25 de nivel 4 (cuatro son alemanes). Haciendo las cuentas con los datos y reglas del propio juego, eso significa que más o menos 1 de cada 10 clubes ofrecidos es alemán aunque seas alemán, así que los clubes alemanes casi no aparecen cuando ya sos fuerte. Estas opciones te dan control sobre eso:
+
+- **País del club**: los clubes que el script te ofrece, o a los que te manda, salen de este país (`Cualquiera` deja las ofertas del juego como están). En Modo Dios con Alemania elegida, tus ofertas pasan a ser el Bayern más uno de los cuatro clubes alemanes de nivel 4, en vez de la élite mundial.
+- **Nivel del club**: `Según mi OVR` elige clubes de tu nivel de oferta (si al país no le quedan clubes en ese nivel, baja primero a clubes más chicos y recién después sube); `Cualquier nivel` elige cualquier club de ese país.
+- **Club nuevo cada período**: después de cada decisión pasás a un club nuevo. Un *período* es el tramo que el juego simula después de cada decisión: 2 temporadas en modo Normal, 1 en modo Largo, 3 en modo Express (usá el modo Largo para cambiar de club en cada temporada). En las pantallas de fichajes se quita la opción de quedarte, así que tenés que elegir uno de los clubes ofrecidos. En las pantallas donde todas las opciones te dejan en tu club (lesiones, polémicas, etc.) el script te manda a un club nuevo justo antes de que decidas. Los préstamos, las ofertas del rival, las de "volver a casa" y otros eventos especiales no se tocan.
+
+La lista de clubes se lee del propio código del juego cuando carga el panel (mirá la línea **Datos de clubes** del panel), así que sigue siendo correcta cuando Copero agrega o renombra clubes.
 
 ## 📋 Requisitos
 
@@ -130,6 +148,8 @@ Como cada paso parte del `player.overall` actual, **si dejamos ese valor donde q
 6. Además, tras cada decisión el juego guarda el estado ya calculado en otro `useState` (`{ previousState, nextState }`) mientras corre la animación; el script también parchea ese `nextState`, así el OVR correcto se ve apenas termina la animación
 7. Repite todo cada 500 ms, porque cada decisión crea un estado nuevo
 
+**Clubes.** El juego incluye su lista de clubes (1.244 clubes en 73 ligas, cada uno con una reputación de −1 a 5) como JSON dentro del chunk `CareerSimulatorPage-<hash>.js`. Cuando carga el panel, el script descarga ese chunk (mismo origen, normalmente ya en la caché del navegador) y lee la lista de ahí. Las ofertas de fichajes se reescriben solo en el próximo estado que el juego ya calculó pero todavía no mostró (el `nextState` de arriba), porque cambiar las opciones de una pantalla que ya está visible rompería sus botones. Mover al jugador solo cambia ids de club (`currentTeamId`, `contractTeamId` y `player.currentTeamId`), lo cual es seguro en cualquier momento; el motor juega las temporadas siguientes con el club de `contractTeamId`.
+
 **El script corre en el contexto de la página** (`@grant none`). Hace falta para poder leer el Fiber que React deja en los nodos del DOM; por eso la configuración se guarda en `localStorage` y no con `GM_setValue`. El `@match` cubre todo `copero.com.ar` porque el sitio es una SPA: si entras al juego desde el menú no hay recarga de página y un `@match` más estricto no se ejecutaría. El panel solo se muestra mientras el juego está en pantalla, y se construye con la API del DOM (sin `innerHTML` ni `<style>`) para no chocar con las políticas de seguridad del sitio.
 
 ### Modo Dios vs Modo Realista
@@ -144,21 +164,26 @@ Como cada paso parte del `player.overall` actual, **si dejamos ese valor donde q
 
 - En los modos con más de una temporada por decisión, la segunda temporada del período parte del OVR de la primera más el desarrollo del propio juego. Por eso, en el historial, alguna temporada puede mostrar uno o dos puntos menos que el OVR que fija el script (sobre todo en edades avanzadas). El OVR actual y el máximo sí quedan en lo configurado.
 - Las sanciones por eventos (por ejemplo, elegir mal en un evento de "sustancia") se simulan dentro del mismo paso en que decidís, así que el script no puede evitarlas; solo impide que se arrastren a los períodos siguientes.
+- Un cambio forzado ocurre justo antes de que decidas, así que el texto de un evento todavía puede nombrar a tu club anterior. Si el script nota una pantalla recién cuando ya está visible, el club que se ve en el encabezado se actualiza un momento después, pero las temporadas igual se juegan con el club nuevo.
+- Las opciones de clubes necesitan los datos de clubes. Si el código del juego cambia tanto que no se puede leer la lista, la línea **Datos de clubes** lo avisa y las opciones de clubes se apagan; todo lo demás sigue funcionando.
 
 ## 🩺 Solución de problemas
 
 **El panel no aparece**
 1. Revisá la nota de permisos de Chrome / Edge de la sección de instalación ("Permitir scripts de usuario" o Modo de desarrollador).
 2. Con el juego abierto, mirá el icono de Tampermonkey: tiene que mostrar un `1` (script activo en esta página).
-3. Abrí la consola del navegador (`F12` → Consola): tiene que aparecer `[copero-hack] v3.0.0 cargado` (`loaded` en la versión en inglés). Si no aparece, el script no se está ejecutando; si aparece pero no ves el panel, copiá el error que haya en rojo.
+3. Abrí la consola del navegador (`F12` → Consola): tiene que aparecer `[copero-hack] v3.1.0 cargado` (`loaded` en la versión en inglés). Si no aparece, el script no se está ejecutando; si aparece pero no ves el panel, copiá el error que haya en rojo.
 
 **El panel aparece pero la línea de estado está en rojo ("No encuentro el estado de la carrera")**
 Copero actualizó el juego y cambió algo por dentro. Para arreglarlo hace falta mirar el código actual:
 1. Con el juego abierto y una carrera empezada, abrí `F12` → **Sources** y buscá en todos los archivos (`Ctrl+Shift+F`) el texto `data-career-phase`.
-2. Guardá ese archivo (será algo como `CareerSimulatorPage-xxxx.js`) y [abrí un issue](https://github.com/Ment1l/copero-hack/issues) con él adjunto.
+2. Guardá ese archivo (será algo como `CareerSimulatorPage-xxxx.js`) y [abrí un issue](https://github.com/Mentil1/copero-hack/issues) con él adjunto.
 
 **Dice "Activo" pero el OVR no cambia**
 El OVR que muestra la pantalla se actualiza en el siguiente paso del juego (cuando tomás la próxima decisión). Si después de un par de decisiones sigue sin cambiar, abrí un issue indicando el modo elegido.
+
+**La línea "Datos de clubes" dice "no disponibles"**
+El script no pudo leer la lista de clubes del código del juego (Copero cambió cómo lo entrega). Las opciones de clubes quedan apagadas hasta que se actualice el script; las de OVR y lesiones siguen funcionando. Recargá la página una vez antes que nada: en la primera carga el navegador puede no haber listado todavía el chunk de código del juego.
 
 ## 📁 Estructura del repositorio
 
@@ -179,24 +204,33 @@ copero-hack/
 Panel en español (el de inglés tiene el mismo diseño):
 
 ```
-┌─────────────────────────────────┐
-│ 🏆 Copero Hack                ✕ │
-├─────────────────────────────────┤
-│ Activo · edad 18 · OVR 58       │
-│                                 │
-│ MODO PREDEFINIDO                │
-│ [Realista                ▼]     │
-│                                 │
-│ OPCIONES                        │
-│ ☐ OVR siempre en 99             │
-│ ☑ OVR basado en edad            │
-│     Pico OVR:    [99]           │
-│     Edad pico:   [28]           │
-│     Sube/año:    [4]            │
-│     Baja desde:  [31]           │
-│     Baja/año:    [2]            │
-│ ☑ Prevenir lesiones             │
-└─────────────────────────────────┘
+┌─────────────────────────────────────┐
+│ 🏆 Copero Hack                    ✕ │
+├─────────────────────────────────────┤
+│ Activo · edad 18 · OVR 58           │
+│                                     │
+│ MODO PREDEFINIDO                    │
+│ [Realista                       ▼]  │
+│                                     │
+│ OPCIONES                            │
+│ ☐ OVR siempre en 99                 │
+│ ☑ OVR basado en edad                │
+│     Pico OVR:        [99]           │
+│     Edad pico:       [28]           │
+│     Sube/año:        [4]            │
+│     Baja desde:      [31]           │
+│     Baja/año:        [2]            │
+│ OVR mínimo:          [40]           │
+│ ☑ Prevenir lesiones                 │
+│                                     │
+│ CLUBES                              │
+│ ☐ Club nuevo cada período           │
+│ País del club:       [Alemania   ▼] │
+│ Nivel del club:      [Según mi OVR▼]│
+│ Datos de clubes: 1244 clubes cargados│
+│ [Restablecer ajustes]               │
+│ v3.1.0 — por Mentil1 (original de …)│
+└─────────────────────────────────────┘
 ```
 
 ## ⚠️ Aviso
@@ -215,7 +249,7 @@ Según el código del juego, al terminar una carrera se reporta el OVR máximo a
 4. Sube la rama (`git push origin feature/mi-mejora`)
 5. Abre un Pull Request
 
-Los dos scripts tienen que mantenerse sincronizados: contienen el mismo código y solo difieren en el texto (etiquetas del panel, mensajes de estado, comentarios). Si cambias la lógica, cambia **los dos** archivos y sube el `@version` en ambos, para que Tampermonkey les ofrezca la actualización a los usuarios que ya lo tienen instalado.
+Los dos scripts tienen que mantenerse sincronizados: contienen el mismo código, y solo difieren el bloque `const T = { ... }` (todos los textos del panel) y los comentarios del encabezado. Si cambias la lógica, cambia **los dos** archivos y sube el `@version` en ambos, para que Tampermonkey les ofrezca la actualización a los usuarios que ya lo tienen instalado.
 
 ## 📝 Licencia
 
@@ -223,4 +257,4 @@ MIT — consulta [`LICENSE`](./LICENSE) para más detalles. El script original e
 
 ---
 
-Mantenido por **Ment1l** · Basado en el *Copero 99 OVR* original de **Carliyo**.
+Mantenido por **Mentil1** · Basado en el *Copero 99 OVR* original de **Carliyo**.
